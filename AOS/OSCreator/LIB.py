@@ -1,4 +1,6 @@
+from datetime import date
 import os
+from xmlrpc.client import Boolean
 
 OSCreatorID = u"pheonixstudios.oscreator.gui.0.1"
 
@@ -19,3 +21,58 @@ class Win:
     Gui = os.path.join(OSC_P, "Gui.py")
     Library = os.path.join(OSC_P, "Library.py")
     CONFIG = os.path.join(OSC_P, "settings.ini")
+
+class Dictionary:
+    def __init__(self) -> None:
+        self.cmds_ = ['check INI', 'write INI', 'delete INI', 'check INI --full', 'write INI --full', 'delete INI --all --instances']
+        self.formats = {
+            'check INI': 'check INI "path" ;value;',
+            'write INI': 'write INI "path" ;value;',
+            'delete INI': 'delete INI "path"',
+            'check INI --full': 'check INI --full "path"',
+            'write INI --full': 'write INI --full "path"',
+            'delete INI --all --instances': 'delete INI --all --instances "path"',
+        }
+
+    def cmds(self) -> list:
+        return self.cmds_
+
+    def checkFORMAT(self, cmd:str) -> bool:
+        for i, v in enumerate(self.cmds_):
+            idx = 0
+            format_ = self.formats[v]
+            for char in format_:
+                if char in cmd and not idx > 0:
+                    continue
+                elif idx == 1:
+                    continue
+                elif char == '"' and idx == 0:
+                    idx = 1
+                elif char == '"' and idx == 1:
+                    idx = 0
+                elif char == ';' and idx == 0:
+                    idx = 1
+                elif char == ';' and idx == 1:
+                    idx = 0
+                else:
+                    return False
+        return True
+
+class logger():
+    def __init__(self, flag, msg, *args) -> None:
+        from datetime import datetime
+        from datetime import date
+        fullcmd = f'T:[{datetime.now().strftime("%H:%M:%S")}] D:[{date.today()}] MSG:[{msg}] CALL['
+        for i, v in enumerate(args):
+            if flag == '' or flag == 'EXCEPTION':
+                if i != 0:
+                    fullcmd += '-' + v
+                else:
+                    fullcmd += v
+            else:
+                if i != 0:
+                    fullcmd += ' ' + v
+                else:
+                    fullcmd += v
+        fullcmd += ']'
+        print(fullcmd)

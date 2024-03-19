@@ -3,15 +3,15 @@ import Library
 import LIB
 
 class Error:
-    def __init__(ErrorLABEL: str, ErrorMSG: str):
-        super().__init__(ErrorLABEL+": "+ErrorMSG)
+    def __init__(self, ErrorLABEL: str, ErrorMSG: str):
+        raise Exception(LIB.logger('', ErrorLABEL+": "+ErrorMSG, 'OSCreator'))
 
 class Kernal:
     def __init__(self, path: str, arch="0x80", filename="untitled"):
         self.avail_archs = ["0x80"]
 
         if not arch in self.avail_archs:
-            raise Error("Architechture Error", f"Architechure [{arch}] is not in architechure list [{self.avail_archs}]")
+            Error("Architechture Error", f"Architechure [{arch}] is not in architechure list [{self.avail_archs}]")
 
         self.path = path
         self.arch = arch

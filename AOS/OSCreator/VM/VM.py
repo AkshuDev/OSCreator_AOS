@@ -5,12 +5,13 @@ import importlib.util
 import sys
 import pyvbox
 
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 from vboxapi import VirtualBoxManager
+from LIB import Win
 import LIB
 
-libw = LIB.Win
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+libw = Win
 
 class INI():
     def __init__(self) -> None:
@@ -102,31 +103,77 @@ class INI():
             }
             return cmdL
 
-    def dict_(self, cmd: list, flag:str=""):
+    def dict_(self, cmd:list, flag=""):
         from LIB import Dictionary as Dict
         from LIB import logger as log
         if flag == 'find':
-            for i, cmd_ in cmd:
+            for i, cmd_ in enumerate(cmd):
                 if '---@---$AOS(' in cmd_ and ')---@---' in cmd_:
                     tokens = self.splitter(cmd_, 'PC_Code(FILE)')
                     return tokens
                 else:
-                    if Dict().cmds() in cmd_:
-                        if Dict().checkFORMAT(cmd_):return True
-                        else:return False
+                    if cmd_ in Dict().cmds():
+                        if Dict().checkFORMAT(cmd_):return {'correct': 'true'}
+                        else:return None
         else:
-            raise Exception(f'{log("", "Wrong Command given", "dict_", "INI", "VM.py", "OSCreator")}')
+            raise Exception(log("", "Wrong Command given", "dict_", "INI", "VM.py", "OSCreator"))
 
-    def parse(self, cmd: list, flag:str=""):
-        tokens = self.dict_(list('find'),flag)
-        if tokens:
-            pass
-        else:
-            raise Exception('Sorry direct [parse] calls are system hazard!')
+    def parse(self, cmd_: list, flag:str=""):
+        for i,cmd in enumerate(cmd_):
+            tokens = self.dict_(list('find'),flag)
+            if tokens:
+                for i,v in enumerate(LIB.Dictionary().cmdL()):
+                    if tokens[v]:
+                        pass
+                    else:
+                        raise Exception(LIB.logger('', 'Wrong [PC_CODE] ', 'parse', 'INI', 'VM.py', 'OSCreator'))
+                if cmd:
+                    if self.dict_(list(cmd), "find"):
+                        if 'check INI' in cmd:
+                            cmd = cmd.replace('check INI ')
+                            if "--full" in cmd:
+                                output = dict()
+                                cmd = cmd.replace("--full ", '')
+                                cmd = cmd.replace('"', '')
+                                path = cmd
+                                from configparser import ConfigParser
+                                try:
+                                    config = ConfigParser()
+                                    file = open(path, "r")
+                                    config.read_file(path)
+                                    sections = config.sections()
+                                    for section in sections:
+                                        items = config.items(section)
+                                        output[section] = dict(items)
+                                    for i,v in enumerate(LIB.Dictionary().iniSEC()):
+                                        if output[v]:
+                                            for i_,v_ in enumerate(LIB.Dictionary().getDATA_SEC(v)):
+                                                if output[v][v_]:
+                                                    if v == "Modules":
+                                                        if i == len(LIB.Dictionary().getDATA_SEC(v)):
+                                                            if output[v][v_] == "installed":
+                                                                return True
+                                                            else:
+                                                                return False
+                                                        else:
+                                                            pass
+                                                else:
+                                                    return False
+                                        else:
+                                            return False
+                                    return True
+                                except Exception:
+                                    raise Exception(LIB.logger('', 'Wrong [PATH] ', 'parse', 'INI', 'VM.py', 'OSCreator'))
+                    else:
+                        raise Exception(LIB.logger('', 'Wrong [CMD] ', 'parse', 'INI', 'VM.py', 'OSCreator'))
+                else:
+                    raise Exception(LIB.logger('', '[CMD] Not Given', 'parse', 'INI', 'VM.py', 'OSCreator'))
+            else:
+                raise Exception('Sorry direct [parse] calls are system hazard!')
 
     def run(self, cmd: str):
         cmd = cmd.strip(" ")
-        if self.dict_(list(cmd)):
+        if self.dict_(list(cmd), "find"):
             self.parse(list(cmd), "---@---$AOS(pheonix-VMpyINIT6_selfCMD:parse)---@---")
 
 import virtualbox as vb
@@ -155,3 +202,8 @@ class VM:
 
         progress = vmM.launch_vm_process(vmS, "gui", [])
         progress.wait_for_completion(10)
+
+if INI().run(f'check INI --full "{libw.CONFIG}"'):
+    print("yes")
+else:
+    print("no")

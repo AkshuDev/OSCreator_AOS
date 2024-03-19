@@ -25,6 +25,9 @@ class Win:
 class Dictionary:
     def __init__(self) -> None:
         self.cmds_ = ['check INI', 'write INI', 'delete INI', 'check INI --full', 'write INI --full', 'delete INI --all --instances']
+        self.cmdL_ = ['file', 'function', 'line_no', 'self', 'variable', 'call']
+        self.iniSEC_ = ['Modules']
+        self.moduleDATA = ['tarfile', 'lzma', 'pyvmomi', 'configparser', 'pyvbox', 'vboxapi', 'virtualbox', 'datetime', 'all']
         self.formats = {
             'check INI': 'check INI "path" ;value;',
             'write INI': 'write INI "path" ;value;',
@@ -36,6 +39,17 @@ class Dictionary:
 
     def cmds(self) -> list:
         return self.cmds_
+
+    def cmdL(self) -> list:
+        return self.cmdL_
+
+    def iniSEC(self) -> list:
+        return self.iniSEC_
+
+    def getDATA_SEC(self, section:str) -> list:
+        if section == "Modules":
+            return self.moduleDATA
+        return []
 
     def checkFORMAT(self, cmd:str) -> bool:
         for i, v in enumerate(self.cmds_):

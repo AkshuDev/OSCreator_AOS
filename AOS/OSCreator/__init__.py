@@ -32,3 +32,16 @@ class Kernal:
         full_path = os.path.join(self.path, self.filename+".asm")
         with open(full_path, "w") as IDT:
             IDT.write(Library.IDT_x80)
+
+def Dependency():
+    import Dependency
+    LIB.logger('', 'Restart script', 'OSCreator')
+    exit(0)
+
+def run():
+    import terminal
+    terminal_ = terminal.PCT_D_()
+    terminal_.init()
+    terminal_.run()
+
+run()

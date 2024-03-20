@@ -171,10 +171,19 @@ class INI():
             else:
                 raise Exception('Sorry direct [parse] calls are system hazard!')
 
-    def run(self, cmd: str):
-        cmd = cmd.strip(" ")
-        if self.dict_(list(cmd), "find"):
-            self.parse(list(cmd), "---@---$AOS(pheonix-VMpyINIT6_selfCMD:parse)---@---")
+    def run(self, cmd: str, cmdL: list=[]):
+        if cmd:
+            cmd = cmd.strip(" ")
+            if self.dict_(list(cmd), "find"):
+                self.parse(list(cmd), "---@---$AOS(pheonix-VMpyINIT4_selfCMD:parse)---@---")
+        else:
+            if cmdL:
+                for i, cmd in enumerate(cmdL):
+                    cmd = cmd.strip(" ")
+                    if self.dict_(list(cmd), "find"):
+                        self.parse(list(cmd), "---@---$AOS(pheonix-VMpyINIT4_selfCMD:parse)---@---")
+            else:
+                raise Exception(LIB.logger('', 'No Command("CMD")', 'INI', 'VM.py', 'OSCreator'))
 
 import virtualbox as vb
 from virtualbox.library import *
@@ -202,8 +211,3 @@ class VM:
 
         progress = vmM.launch_vm_process(vmS, "gui", [])
         progress.wait_for_completion(10)
-
-if INI().run(f'check INI --full "{libw.CONFIG}"'):
-    print("yes")
-else:
-    print("no")

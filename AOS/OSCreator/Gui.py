@@ -202,7 +202,7 @@ class OS_Creator_GUI(QMainWindow):
         name_label.setGeometry(0, 100, self.width(), 80)
         self.name = QLineEdit(self)
         self.name.setStyleSheet('QLineEdit{color: gray;background-color: #ececec;border: 2px solid black} QLineEdit:hover{color: black;background-color:gray;border-color:#ececec}')
-        self.name.setGeometry(370, 300, self.width() / 2, 90)
+        self.name.setGeometry(370, 300, int(self.width() / 2), 90)
         font.setPointSize(20)
         self.name.setFont(font)
         self.cancel = QPushButton("Cancel", self)
@@ -245,9 +245,9 @@ class OS_Creator_GUI(QMainWindow):
             except Exception:
                 raise Exception(f"Sorry no folder named [{abs_path}]. Please Create a folder named [old_projects] in the location where this script is located, and restart this script.")
 
-        oscG = oscgui.OSCMainVM()
+        self.clear_view()
+        oscG = oscgui.LS(self)
         oscG.show()
-        QApplication.quit()
 
     def backHOME(self):
         self.clear_view()

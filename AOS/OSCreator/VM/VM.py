@@ -10,6 +10,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from vboxapi import VirtualBoxManager
 from LIB import Win
 import LIB
+from LIB import List as list_
 
 libw = Win
 
@@ -103,7 +104,7 @@ class INI():
             }
             return cmdL
 
-    def dict_(self, cmd:list, flag=""):
+    def dict_(self, cmd, flag=""):
         from LIB import Dictionary as Dict
         from LIB import logger as log
         if flag == 'find':
@@ -113,14 +114,17 @@ class INI():
                     return tokens
                 else:
                     if cmd_ in Dict().cmds():
-                        if Dict().checkFORMAT(cmd_):return {'correct': 'true'}
+                        if Dict().checkFORMAT(cmd_):
+                            return {'correct': 'true'}
                         else:return None
+                    else:
+                        return False
         else:
             raise Exception(log("", "Wrong Command given", "dict_", "INI", "VM.py", "OSCreator"))
 
-    def parse(self, cmd_: list, flag:str=""):
+    def parse(self, cmd_, flag:str=""):
         for i,cmd in enumerate(cmd_):
-            tokens = self.dict_(list('find'),flag)
+            tokens = self.dict_(list_(flag).list(), 'find')
             if tokens:
                 for i,v in enumerate(LIB.Dictionary().cmdL()):
                     if tokens[v]:
@@ -128,19 +132,17 @@ class INI():
                     else:
                         raise Exception(LIB.logger('', 'Wrong [PC_CODE] ', 'parse', 'INI', 'VM.py', 'OSCreator'))
                 if cmd:
-                    if self.dict_(list(cmd), "find"):
+                    if self.dict_(list_(cmd).list(), "find"):
                         if 'check INI' in cmd:
-                            cmd = cmd.replace('check INI ')
+                            cmd = cmd.replace('check INI ', '')
                             if "--full" in cmd:
                                 output = dict()
                                 cmd = cmd.replace("--full ", '')
-                                cmd = cmd.replace('"', '')
-                                path = cmd
+                                path = self.file
                                 from configparser import ConfigParser
                                 try:
                                     config = ConfigParser()
-                                    file = open(path, "r")
-                                    config.read_file(path)
+                                    read = config.read(path)
                                     sections = config.sections()
                                     for section in sections:
                                         items = config.items(section)
@@ -173,15 +175,13 @@ class INI():
 
     def run(self, cmd: str, cmdL: list=[]):
         if cmd:
-            cmd = cmd.strip(" ")
-            if self.dict_(list(cmd), "find"):
-                self.parse(list(cmd), "---@---$AOS(pheonix-VMpyINIT4_selfCMD:parse)---@---")
+            if self.dict_(list_(cmd).list(), "find"):
+                self.parse(list_(cmd).list(), "---@---$AOS(pheonix-VMpyINIT4_selfCMD:parse)---@---")
         else:
             if cmdL:
                 for i, cmd in enumerate(cmdL):
-                    cmd = cmd.strip(" ")
-                    if self.dict_(list(cmd), "find"):
-                        self.parse(list(cmd), "---@---$AOS(pheonix-VMpyINIT4_selfCMD:parse)---@---")
+                    if self.dict_(list_(cmd).list(), "find"):
+                        self.parse(list_(cmd).list(), "---@---$AOS(pheonix-VMpyINIT4_selfCMD:parse)---@---")
             else:
                 raise Exception(LIB.logger('', 'No Command("CMD")', 'INI', 'VM.py', 'OSCreator'))
 

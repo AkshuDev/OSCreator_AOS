@@ -29,12 +29,12 @@ class Dictionary:
         self.iniSEC_ = ['Modules']
         self.moduleDATA = ['tarfile', 'lzma', 'pyvmomi', 'configparser', 'pyvbox', 'vboxapi', 'virtualbox', 'datetime', 'all']
         self.formats = {
-            'check INI': 'check INI "path" ;value;',
-            'write INI': 'write INI "path" ;value;',
-            'delete INI': 'delete INI "path"',
-            'check INI --full': 'check INI --full "path"',
-            'write INI --full': 'write INI --full "path"',
-            'delete INI --all --instances': 'delete INI --all --instances "path"',
+            'check INI': 'check INI',
+            'write INI': 'write INI',
+            'delete INI': 'delete INI',
+            'check INI --full': 'check INI --full',
+            'write INI --full': 'write INI --full',
+            'delete INI --all --instances': 'delete INI --all --instances',
         }
 
     def cmds(self) -> list:
@@ -52,24 +52,19 @@ class Dictionary:
         return []
 
     def checkFORMAT(self, cmd:str) -> bool:
+        idx = 0
         for i, v in enumerate(self.cmds_):
-            idx = 0
-            format_ = self.formats[v]
-            for char in format_:
-                if char in cmd and not idx > 0:
-                    continue
-                elif idx == 1:
-                    continue
-                elif char == '"' and idx == 0:
-                    idx = 1
-                elif char == '"' and idx == 1:
-                    idx = 0
-                elif char == ';' and idx == 0:
-                    idx = 1
-                elif char == ';' and idx == 1:
-                    idx = 0
-                else:
-                    return False
+            if v == cmd:
+                format_ = self.formats[v]
+                for char in format_:
+                    cmd_ = cmd[idx]
+                    if cmd_ == char:
+                        idx += 1
+                        continue
+                    else:
+                        return False
+            else:
+                continue
         return True
 
 class logger():
@@ -89,4 +84,17 @@ class logger():
                 else:
                     fullcmd += v
         fullcmd += ']'
-        print(fullcmd)
+        if flag == '' or flag == 'EXCEPTION':
+            self.exception(fullcmd)
+
+    def exception(self, cmd) -> str:
+        return cmd
+
+class List():
+    def __init__(self, *args) -> None:
+        self.list_ = []
+        for i,v in enumerate(args):
+            self.list_.append(v)
+
+    def list(self) -> list:
+        return self.list_

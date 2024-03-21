@@ -43,5 +43,3 @@ def run():
     terminal_ = terminal.PCT_D_()
     terminal_.init()
     terminal_.run()
-
-run()
